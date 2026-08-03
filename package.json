@@ -1,0 +1,14 @@
+{
+  "name": "ruanyifeng-weekly-search",
+  "version": "1.0.0",
+  "description": "阮一峰《科技爱好者周刊》检索索引：搜索周刊内容并直接跳转到 ruanyifeng.com 对应位置。",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:full": "node scripts/build.mjs --full",
+    "start": "npx --yes serve site"
+  },
+  "dependencies": {
+    "minisearch": "^7.1.0"
+  }
+}
