@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "build:full": "node scripts/build.mjs --full",
-    "start": "npx --yes serve site"
+    "start": "npx --yes serve"
   },
   "dependencies": {
     "minisearch": "^7.1.0"

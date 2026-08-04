@@ -17,7 +17,7 @@
   // -------------------------------------------------------------------------
   async function load() {
     try {
-      const res = await fetch('./index.json', { cache: 'no-cache' });
+      const res = await fetch('site/index.json', { cache: 'no-cache' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
 
       // 真实下载进度：用 streaming reader 统计已接收字节 / Content-Length。
