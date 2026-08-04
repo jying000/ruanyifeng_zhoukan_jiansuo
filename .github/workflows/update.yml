@@ -1,67 +1,36 @@
-name: Update weekly index
+name: 构建周刊索引
 
 on:
   schedule:
-    # 每周五 08:15 北京时间 = 00:15 UTC（GitHub Actions 使用 UTC）。
-    # 阮一峰约北京时间 08:08 发布周刊，故 08:15 通常可抓到最新一期。
-    # 若担心偶发延迟发布，可改为 '30 0 * * 5'（09:30 北京时间）。
-    - cron: '15 0 * * 5'
-  push:
-    branches: [main, master]
-  workflow_dispatch:
+    # 北京时间每周四 21:00 执行 = UTC 周四 13:00
+    # 周刊每周五发布，但作者随后可能修正出处/链接错误。
+    # 周四晚只拉取「上一个周五」发布的那一期（已发布满一周、大概率已稳定），
+    # 不拉当周周五刚发布、可能尚未修正的最新一期，也不重拉更早历史（脚本按精确发表日期判断）。
+    - cron: '0 13 * * 4'
+  workflow_dispatch: {}  # 允许手动触发
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build index (incremental)
-        run: node scripts/build.mjs
-
-      - name: Commit updated index
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: 提交更新的索引
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if [ -n "$(git status --porcelain site/index.json)" ]; then
-            git add site/index.json
-            git commit -m "chore: auto-update weekly index [skip ci]"
-            git push
+          if git diff --quiet -- site/index.json; then
+            echo "索引无变化，跳过提交。"
           else
-            echo "No changes to index.json"
+            git add site/index.json
+            git commit -m "chore: 增量更新周刊索引（$(date -u +%Y-%m-%d)）"
+            git push
           fi
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

@@ -4,7 +4,8 @@
  *
  * 流程：
  *  1. 抓取 ruanyifeng.com 周刊归档页，得到 期号 -> URL 的权威映射（含发布日期）。
- *  2. 过滤出 2023-01 起、且（增量模式下）尚未索引的期号。
+ *  2. 过滤出 2023-01 起、且（增量模式下）尚未索引的期号；增量模式下再于抓取后
+ *     按「精确发表日期 <= 上一个周五」跳过当周刚发布、未稳定的最新一期。
  *  3. 对每期抓取 GitHub raw Markdown，按「每条资源条目」解析为可搜索条目。
  *  4. 对每期抓取 ruanyifeng.com 页面 HTML，提取栏目锚点（<h2 id>），用于深链定位。
  *  5. 增量合并写入 site/index.json（同时作为浏览器检索数据与增量状态）。
@@ -17,8 +18,8 @@
  *  - 日期优先取 ruanyifeng.com 单期页面的精确发表日期，失败回退到归档页年月（日默认 01）。
  *
  * 用法：
- *  node scripts/build.mjs            # 增量构建（仅新增期号）
- *  node scripts/build.mjs --full     # 全量重建（清空后从 2023 起重新索引）
+ *  node scripts/build.mjs            # 增量构建（仅新增、且发布日期 <= 上一个周五的期号，跳过当周未稳定最新一期）
+ *  node scripts/build.mjs --full     # 全量重建（清空后从 2023 起重新索引，不受上一个周五约束）
  */
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -37,6 +38,26 @@ const SOURCE = 'ruanyf/weekly';
 
 // 索引起始日期（含）
 const MIN_DATE = '2023-01-01';
+
+/**
+ * 计算「上一个周五」的日期（ISO，YYYY-MM-DD）。
+ * 周刊每周五发布，但作者发布后常会修正出处/链接错误。
+ * 为避免拉到当周刚发布、尚未稳定的最新一期，定时任务在周四晚执行，
+ * 只拉取上一个周五（及之前）已发布满一周、大概率已修正的周刊。
+ * 定义：相对于今天最近过去的那个周五（不含今天，若今天就是周五则取上周五）。
+ */
+function lastFriday(now = new Date()) {
+  // 以本地日期计算（cron 在固定时区运行），转成 YYYY-MM-DD。
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const day = d.getDay(); // 0=周日 ... 5=周五 ... 6=周六
+  // 距离上一个周五的天数：周五(5) -> 7天前；周六(6) -> 1天前；周日(0) -> 2天前；周一(1) -> 3天前 ...
+  const offset = day >= 5 ? day - 5 + 7 : day + 2;
+  d.setDate(d.getDate() - offset);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
 
 // 不索引的栏目 / 终止栏目
 const SKIP_SECTIONS = new Set(['封面图', '封面']);
@@ -274,12 +295,26 @@ async function main() {
 
   console.log(`[2/4] 待处理期数：${candidates.length} 期（${fullRebuild ? '全量重建' : '增量'}）。`);
 
+  // 增量模式：定时任务在周四晚执行。周刊每周五发布，作者随后可能修正出处/链接错误。
+  // 因此只拉取「上一个周五」发布的那一期（已发布满一周、大概率已稳定），
+  // 既跳过当周周五刚发布、尚未稳定的最新一期，也不重拉更早的历史期。
+  // 注意：必须用就绪后的「精确发表日期」判断，归档页年月（日默认 01）不可靠。
+  const cutoff = fullRebuild ? null : lastFriday();
+  if (cutoff) {
+    console.log(`      增量模式：只拉取上一个周五 ${cutoff} 发布的期（其余跳过）。`);
+  }
+
   const newItems = [];
   const tasks = candidates.map(([n, info]) => async () => {
     const [md, html] = await Promise.all([fetchText(RAW_MD(n)), fetchText(info.url)]);
     // 优先用 ruanyifeng.com 的精确发表日期，失败回退到归档页的年月（日默认 01）。
     const exactDate = extractPublishedDate(html);
     const date = exactDate || info.date;
+    // 增量模式：只处理「精确发表日期 === 上一个周五」的那一期；其余一律跳过。
+    if (cutoff && date !== cutoff) {
+      console.log(`      ⊘ 第 ${n} 期（${date}）不是上一个周五 ${cutoff}，跳过。`);
+      return [];
+    }
     const { issueTitle, items } = parseMarkdown(md, n, info.url, date);
     console.log(`      ✓ 第 ${n} 期：${items.length} 条（${date}）`);
     return items;

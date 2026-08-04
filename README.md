@@ -13,8 +13,8 @@
 
 ```bash
 npm install
-node scripts/build.mjs          # 增量构建（仅新增期号）
-node scripts/build.mjs --full   # 全量重建（清空后从 2023 起重新索引）
+node scripts/build.mjs          # 增量构建（仅新增、且发布日期 <= 上一个周五的期号）
+node scripts/build.mjs --full   # 全量重建（清空后从 2023 起重新索引，不受上一个周五约束）
 ```
 
 构建产物为 `site/index.json`（同时作为浏览器检索数据与增量状态）。本地预览：
@@ -23,8 +23,6 @@ node scripts/build.mjs --full   # 全量重建（清空后从 2023 起重新索�
 cd site && python3 -m http.server 8080
 # 浏览器打开 http://localhost:8080
 ```
-
-
 ## 技术要点
 
 - 期号→URL 映射来自 ruanyifeng.com 周刊归档页（权威、含发布日期），避免猜测日期导致 404。
