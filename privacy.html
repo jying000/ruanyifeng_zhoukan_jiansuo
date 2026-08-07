@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>隐私政策 - 阮一峰周刊检索</title>
+  <meta name="description" content="阮一峰周刊检索站的隐私政策，说明信息收集、Cookie 与 Google AdSense 广告的使用。" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="site/styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="brand-mark">阮</div>
+        <div class="brand-text">
+          <h1>阮一峰周刊检索</h1>
+          <p>搜索 2023 年至今的周刊内容</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <a class="github-link" href="index.html" data-back-to-index>返回检索</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="hero" style="text-align:left;">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:24px 20px 60px;">
+      <h1 style="font-size:26px;margin:8px 0 4px;">隐私政策</h1>
+      <p class="muted" style="color:#94a3b8;font-size:13px;">最后更新：2026-08-06</p>
+
+      <h2 style="font-size:18px;margin-top:28px;">1. 我们收集的信息</h2>
+      <p style="line-height:1.8;color:var(--text-soft);">
+        本网站是一个静态检索索引，本身不要求注册账号，也不主动收集您的姓名、邮箱等个人身份信息。
+        当您使用站内搜索时，所有检索均在您的浏览器本地完成（基于预构建的索引数据），搜索关键词不会被发送到本站服务器。
+      </p>
+
+      <h2 style="font-size:18px;margin-top:28px;">2. Cookie 与第三方广告</h2>
+      <p style="line-height:1.8;color:var(--text-soft);">
+        本站使用 <strong>Google AdSense</strong> 展示广告。Google 及其合作伙伴可能通过 Cookie、Web Beacon 等技术与设备标识符，
+        用于向您投放个性化广告并衡量广告效果。这些第三方可能收集或推断您的使用信息（如设备、浏览器、大致地理位置、浏览行为等）。
+        您可以通过 <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google 广告设置</a>
+        管理您的广告偏好，或访问 <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener">YourAdChoices</a> 退出个性化广告。
+      </p>
+
+      <h2 style="font-size:18px;margin-top:28px;">3. 第三方服务</h2>
+      <p style="line-height:1.8;color:var(--text-soft);">
+        除 Google AdSense 外，本站不集成其他会收集个人信息的第三方分析或追踪服务。
+        搜索结果所指向的内容均托管于 <a href="https://www.ruanyifeng.com/blog/weekly/" target="_blank" rel="noopener">ruanyifeng.com</a>，
+        其隐私实践以原站为准。
+      </p>
+
+      <h2 style="font-size:18px;margin-top:28px;">4. 内容版权</h2>
+      <p style="line-height:1.8;color:var(--text-soft);">
+        本站仅为检索索引，所有周刊内容版权归原作者阮一峰所有。本站不复制、不存储正文内容，仅提供跳转链接。
+      </p>
+
+      <h2 style="font-size:18px;margin-top:28px;">5. 联系我们</h2>
+      <p style="line-height:1.8;color:var(--text-soft);">
+        如对本隐私政策有疑问，可通过本站 GitHub 仓库提交 Issue 与我们联系。
+      </p>
+
+      <p style="margin-top:32px;"><a href="index.html" data-back-to-index style="color:var(--primary);text-decoration:none;">← 返回检索首页</a></p>
+    </div>
+  </main>
+
+  <script>
+    // 返回检索页：若从本站 index 进入（referrer 为本站首页），用 history.back() 回到 index，
+    // 借助浏览器 bfcache 不重新加载索引资源；否则（直接打开/地址栏输入/外站进入）直接跳转到 index.html。
+    (function () {
+      var referrer = document.referrer || '';
+      var sameOrigin = referrer.indexOf(location.host) !== -1;
+      var fromIndex = sameOrigin &&
+        (referrer.endsWith('/index.html') || /\/index\.html[#?]/.test(referrer) ||
+         referrer.replace(/\/$/, '').replace(/[#?].*$/, '') === location.origin);
+
+      function goBackToIndex(e) {
+        e.preventDefault();
+        if (fromIndex && history.length > 1) {
+          history.back();
+        } else {
+          location.href = 'index.html';
+        }
+      }
+
+      var links = document.querySelectorAll('[data-back-to-index]');
+      for (var i = 0; i < links.length; i++) {
+        links[i].addEventListener('click', goBackToIndex);
+      }
+    })();
+  </script>
+</body>
+</html>

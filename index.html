@@ -2,11 +2,15 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>阮一峰周刊检索</title>
-  <meta name="description" content="搜索阮一峰《科技爱好者周刊》2023 年至今的内容，直接跳转到 ruanyifeng.com 对应位置。" />
+  <meta name="description" content="搜索阮一峰《科技爱好者周刊》2023 年至上一期的内容，直接跳转到 ruanyifeng.com 对应位置。" />
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="stylesheet" href="site/styles.css" />
+
+  <!-- Google AdSense（占位 client，审核通过后替换 ca-pub-XXXXXX 为真实发布商 ID） -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXX"
+          crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="aurora"></div>
@@ -17,7 +21,7 @@
         <div class="brand-mark">阮</div>
         <div class="brand-text">
           <h1>阮一峰周刊检索</h1>
-          <p>搜索 2023 年至今的周刊内容</p>
+          <p>搜索 2023 年至上一期的周刊内容，最新一期请去读原周刊</p>
         </div>
       </div>
       <div class="nav-actions">
@@ -48,9 +52,23 @@
 
   <section class="results" id="results" aria-live="polite"></section>
 
+  <!-- AdSense 广告位：页脚上方展示广告 -->
+  <div class="ad-slot" aria-label="广告">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXX"
+         data-ad-slot="ZZZZZZZ"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
   <footer class="footer">
-    <p>内容来自 <a href="https://www.ruanyifeng.com/blog/weekly/" target="_blank" rel="noopener">ruanyifeng.com</a>，每周五自动更新。索引仅含 2023 年起、且不含封面图与言论之后的内容。</p>
+    <p>内容来自 <a href="https://www.ruanyifeng.com/blog/weekly/" target="_blank" rel="noopener">ruanyifeng.com</a>，每周四自动更新上一期周刊索引。
+      <div>含 2023 年起至上一期（最新一期请去看周刊原文）、且不含封面图与言论之后的内容。</div>
+    </p>
     <p class="muted">本页面为检索索引，所有内容版权归原作者所有，点击结果将跳转至原站。</p>
+    <p class="muted"><a href="privacy.html">隐私政策</a></p>
   </footer>
 
   <script src="site/vendor/minisearch.umd.min.js"></script>

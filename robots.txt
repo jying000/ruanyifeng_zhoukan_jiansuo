@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://weekly.jiaxiaojiaolian.cn/sitemap.xml

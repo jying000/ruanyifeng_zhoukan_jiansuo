@@ -61,11 +61,14 @@ body {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 14px 20px;
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
 }
-.brand { display: flex; align-items: center; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .brand-mark {
   width: 42px; height: 42px;
   display: grid; place-items: center;
@@ -84,6 +87,7 @@ body {
   border: 1px solid rgba(99,102,241,0.2);
   background: rgba(255,255,255,0.5);
   transition: .2s;
+  cursor: pointer;
 }
 .github-link:hover { color: var(--primary); border-color: var(--primary-2); transform: translateY(-1px); }
 .nav-actions {
@@ -314,6 +318,8 @@ body {
   display: flex; flex-direction: column;
   border-top: 1px solid rgba(99,102,241,0.12);
 }
+/* display:flex 会覆盖 [hidden] 默认的 display:none，必须显式声明 */
+.collapsed-list[hidden] { display: none; }
 .collapsed-row {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 4px;
@@ -354,7 +360,9 @@ mark {
 .footer {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 24px 20px 48px;
+  padding: 24px 20px calc(48px + env(safe-area-inset-bottom));
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
   text-align: center;
   font-size: 12.5px;
   color: var(--text-soft);
@@ -363,6 +371,7 @@ mark {
 .footer a { color: var(--primary); text-decoration: none; }
 .footer a:hover { text-decoration: underline; }
 .footer .muted { color: #94a3b8; margin-top: 6px; }
+
 
 /* 暗色模式 */
 @media (prefers-color-scheme: dark) {
@@ -380,10 +389,31 @@ mark {
 }
 
 @media (max-width: 560px) {
-  .hero { padding-top: 40px; }
+  .hero { padding-top: 40px; padding-left: 16px; padding-right: 16px; }
   #search { font-size: 16px; padding: 15px 16px 15px 16px; }
   .card { padding: 15px 16px; }
   .brand-text p { display: none; }
+  /* 窄屏下聚焦放大容易触发横向溢出，关闭它更稳 */
+  #search:focus { transform: none; }
+}
+
+/* 针对 iPhone 12/13/14 标准版与 Pro（390px）等更窄机型细化 */
+@media (max-width: 430px) {
+  .nav-inner { padding: 10px 14px; gap: 8px; }
+  .brand { gap: 9px; }
+  .brand-mark { width: 36px; height: 36px; font-size: 17px; border-radius: 10px; }
+  .brand-text h1 { font-size: 15.5px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brand-text { min-width: 0; }
+  .nav-actions .precision-toggle { gap: 2px; }
+  .nav-actions .precision-opt { font-size: 12.5px; padding: 5px 11px; }
+  .hero { padding-top: 32px; padding-left: 14px; padding-right: 14px; }
+  #search { font-size: 16px; padding: 14px 16px 14px 44px; }
+  .search-icon { left: 15px; }
+  .results { padding-left: 14px; padding-right: 14px; }
+  .ad-slot { padding-left: 14px; padding-right: 14px; }
+  .footer { padding-left: 14px; padding-right: 14px; }
+  .item-title { font-size: 16px; }
+  .snippet { font-size: 13.5px; }
 }
 
 /* 滚动条美化 */

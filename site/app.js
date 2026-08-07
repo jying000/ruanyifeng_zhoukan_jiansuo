@@ -148,11 +148,16 @@
       boost: { itemTitle: 3, section: 2, issueTitle: 1.5 },
     });
     // MiniSearch 的搜索结果默认已合并 storeFields，但保险起见按 id 回查原始条目。
+    // 注意：必须浅拷贝成新对象。若直接复用 allItems 里的共享对象，_contentFields /
+    // _collapsedIssue 这类每次搜索的临时状态会残留到下一次搜索，
+    // 导致上一次的折叠汇总（如「38 条均仅命中标题」）错误地出现在本次结果上。
     let matched = r.map((x) => {
-      const item = allItems.find((it) => it.id === x.id) || x;
+      const src = allItems.find((it) => it.id === x.id) || x;
       // 记录该条目命中了哪些内容字段（用于去重判断）。
-      item._contentFields = contentHitFields(x.match);
-      return item;
+      return Object.assign({}, src, {
+        _contentFields: contentHitFields(x.match),
+        _collapsedIssue: null,
+      });
     });
     if (activeSection) matched = matched.filter((i) => i.section === activeSection);
     // 同刊去重：若一期中存在命中具体内容字段（itemTitle/snippet/section）的条目，
