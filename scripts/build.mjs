@@ -343,6 +343,14 @@ async function main() {
     source: SOURCE,
   };
 
+  // 增量模式若没有任何新增条目，则不重写 index.json（避免 generatedAt 时间戳刷新、
+  // 被 auto-update.sh 的 git diff 误判为变化而空提交）。
+  if (!fullRebuild && newItems.length === 0) {
+    console.log(`[3/4] 增量模式无新增条目，跳过写出 index.json（共 ${merged.length} 条，覆盖 ${issueNumbers.length} 期）。`);
+    console.log('[4/4] 完成。');
+    return;
+  }
+
   console.log(`[3/4] 写出 index.json：共 ${merged.length} 条，覆盖 ${issueNumbers.length} 期。`);
   await writeFile(INDEX_PATH, JSON.stringify({ meta, items: merged }, null, 0));
 
